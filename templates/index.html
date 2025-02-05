@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <title>Unsplash Photo Search</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Photo Search</h1>
+        <input type="text" id="search-input" placeholder="Введите слово для поиска...">
+        <button id="search-button">Поиск</button>
+        <div id="results"></div>
+        <div id="loading" style="display:none;">Загрузка...</div>
+        <div id="error" style="display:none;">Нет результатов</div>
+    </div>
+
+    <script>
+        document.getElementById('search-button').addEventListener('click', function() {
+            const query = document.getElementById('search-input').value;
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('results').innerHTML = '';
+            document.getElementById('error').style.display = 'none';
+
+            fetch(`/search?query=${query}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('loading').style.display = 'none';
+                    if (data.results.length > 0) {
+                        data.results.forEach(photo => {
+                            const img = document.createElement('img');
+                            img.src = photo.urls.small;
+                            img.alt = photo.alt_description;
+                            img.onclick = () => {
+                                window.open(photo.urls.full, '_blank');
+                            };
+                            document.getElementById('results').appendChild(img);
+                        });
+                    } else {
+                        document.getElementById('error').style.display = 'block';
+                    }
+                });
+        });
+    </script>
+</body>
+</html>
