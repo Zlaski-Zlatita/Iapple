@@ -3,7 +3,7 @@ import requests
 
 app = Flask(__name__)
 
-UNSPLASH_API_KEY = 'YOUR_UNSPLASH_API_KEY'  # Замените на ваш API ключ Unsplash
+UNSPLASH_API_KEY = 'YOUR_UNSPLASH_API_KEY' 
 UNSPLASH_API_URL = 'https://api.unsplash.com/search/photos'
 
 @app.route('/')
