@@ -3,45 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <title>Unsplash Photo Search</title>
+    <title>Photo Search</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .photo {
+            margin: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .photo img {
+            border-radius: 5px;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <h1>Photo Search</h1>
-        <input type="text" id="search-input" placeholder="Введите слово для поиска...">
-        <button id="search-button">Поиск</button>
-        <div id="results"></div>
-        <div id="loading" style="display:none;">Загрузка...</div>
-        <div id="error" style="display:none;">Нет результатов</div>
+        <h1 class="mt-5">Photo Search</h1>
+        <form id="search-form" class="mt-5">
+            <div class="input-group mb-3">
+                <input type="text" id="query" class="form-control" placeholder="Search for photos..." required>
+                <div class="input-group-append">
+                    <button class="btn btn-primary" type="submit">Search</button>
+                </div>
+            </div>
+        </form>
+        <div id="results" class="row"></div>
     </div>
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        document.getElementById('search-button').addEventListener('click', function() {
-            const query = document.getElementById('search-input').value;
-            document.getElementById('loading').style.display = 'block';
-            document.getElementById('results').innerHTML = '';
-            document.getElementById('error').style.display = 'none';
+        $(function() {
+            $('#search-form').on('submit', function(event) {
+                event.preventDefault();
+                const query = $('#query').val();
+                $('#results').empty();
 
-            fetch(`/search?query=${query}`)
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('loading').style.display = 'none';
-                    if (data.results.length > 0) {
-                        data.results.forEach(photo => {
-                            const img = document.createElement('img');
-                            img.src = photo.urls.small;
-                            img.alt = photo.alt_description;
-                            img.onclick = () => {
-                                window.open(photo.urls.full, '_blank');
-                            };
-                            document.getElementById('results').appendChild(img);
-                        });
-                    } else {
-                        document.getElementById('error').style.display = 'block';
-                    }
-                });
+                $.getJSON('/search', { query: query })
+                    .done(function(data) {
+                        if (data.results) {
+                            data.results.forEach(photo => {
+                                $('#results').append(`
+                                    <div class="col-md-4">
+                                        <div class="photo">
+                                            <img src="${photo.urls.small}" alt="${photo.alt_description}" class="img-fluid">
+                                            <div class="p-2">
+                                                <p>${photo.description || 'No Description'}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `);
+                            });
+                        }
+                    })
+                    .fail(function() {
+                        $('#results').append('<p class="text-danger">Failed to retrieve photos.</p>');
+                    });
+            });
         });
     </script>
 </body>
 </html>
+
