@@ -4,7 +4,7 @@ import requests
 app = Flask(__name__)
 
 UNSPLASH_API_KEY = 'YOUR_UNSPLASH_API_KEY' 
-UNSPLASH_API_URL = 'https://api.unsplash.com/search/photos'
+UNSPLASH_API_URL = 'https://iapple-mnko.vercel.app/'
 
 mock_data = {
     "IPhone 14": [
